@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-from sklearn.decomposition import FastICA
+from sklearn.feature_selection import SelectFwe, f_classif
 from sklearn.model_selection import train_test_split
-from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
+from sklearn.svm import LinearSVC
 from tpot.export_utils import set_param_recursive
 
 # NOTE: Make sure that the outcome column is labeled 'target' in the data file
@@ -12,10 +12,10 @@ features = tpot_data.drop('target', axis=1)
 training_features, testing_features, training_target, testing_target = \
             train_test_split(features, tpot_data['target'], random_state=42)
 
-# Average CV score on the training set was: 0.8174348284283653
+# Average CV score on the training set was: 0.8113144270342956
 exported_pipeline = make_pipeline(
-    FastICA(tol=0.8500000000000001),
-    MLPClassifier(alpha=0.0001, learning_rate_init=0.01)
+    SelectFwe(score_func=f_classif, alpha=0.036000000000000004),
+    LinearSVC(C=0.0001, dual=True, loss="squared_hinge", penalty="l2", tol=0.001)
 )
 # Fix random state for all the steps in exported pipeline
 set_param_recursive(exported_pipeline.steps, 'random_state', 42)
